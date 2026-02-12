@@ -8,7 +8,18 @@ export class TermSuggestionService {
    * @throws Error si les chaînes n'ont pas la même longueur.
    */
   getDifferenceScore(source: string, target: string): number {
-    throw new Error('Not implemented');
+    const iterableArray = source.split('')
+    let result = 0
+
+    if (source.length !== target.length) {
+      throw new Error('Source and target have different lengths')
+    }
+
+    for (const [index, char] of iterableArray.entries()) {
+      result += char !== target[index] ? 1 : 0
+    }
+
+    return result
   }
 
   /**
@@ -17,7 +28,25 @@ export class TermSuggestionService {
    * Retourne `null` si le candidat est trop court.
    */
   getMinDifferenceScore(term: string, candidate: string): number | null {
-    throw new Error('Not implemented');
+    let result = 0
+    // We populate the temporary results array with the highest number possible, that is the length of the candidate
+    let temp:  number[] = [
+      
+    ]
+
+    if (term.length > candidate.length) {
+      return null
+    }
+
+    if(term.length === candidate.length) {
+      return this.getDifferenceScore(term, candidate)
+    }
+
+    for(let i = 0; i <= candidate.length - term.length; i++) {
+      temp.push(this.getDifferenceScore(term, candidate.substring(i, i + term.length)))
+    }
+
+    return Math.min(...temp)
   }
 
   /**

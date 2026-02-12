@@ -117,7 +117,7 @@ describe('TermSuggestionService', () => {
   // =========================================================================
   // suggest — algorithme principal
   // =========================================================================
-  describe('suggest', () => {
+  describe.only('suggest', () => {
     // ----- Exemple de l'énoncé -----
     it('should return the expected result from the problem statement', () => {
       const terms = ['gros', 'gras', 'graisse', 'agressif', 'go', 'ros', 'gro'];
