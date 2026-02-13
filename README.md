@@ -9,4 +9,4 @@ According to the statement of problem 1 ` Suggestions de terme `, I will proceed
 - I've generated the project in ` Angular v21 ` and accordingly to the CLI, I'm using ` Vitest ` as test runner.
 - I've decided to only implement the ` TermSuggestionService ` and not make UI components as the service is fully and heavily tested (with all the possible ways that I could think of)
 
-For further impementation details, refer to the Angular ` web ` project inside this repository.
+For further implementation details, refer to the Angular ` web ` project inside this repository.
