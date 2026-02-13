@@ -58,29 +58,44 @@ export class TermSuggestionService {
    * Les termes plus courts que `term` sont exclus.
    */
   suggest(term: string, terms: string[], count: number): string[] {
+    // Calculate all the minimum difference scores for each term in the list, returning null for those that are too short
     const minDifferences: (number | null)[] = terms.map((element) => this.getMinDifferenceScore(term, element))
+
+    // We create a map of the minimum differences with their corresponding index, 
+    // so we can sort them while keeping track of the original index to retrieve the corresponding term later
     const mappedMinDifferences = new Map(minDifferences.map((value, index) => {
+      // If the value is null, we want to put it at the end of the map, 
+      // so we return null as the key, and the value as null, so it will be sorted at the end of the map
       if(value === null) {
         return [null, value]
       }
       return [index, value]
     }))
-    const sortedMappedMinDifferences = new Map([...mappedMinDifferences.entries()].sort(customSort()))
 
+    // We sort the map by the minimum difference score, using the custom sort function that puts null values at the end of the map, and if the values are equal, 
+    // it keeps the original order (which is the order of the terms in the input array)
+    const sortedMappedMinDifferences = new Map([...mappedMinDifferences.entries()].sort(customSort))
+
+    // We create an array of the keys of the sorted map, 
+    // which are the indices of the terms in the input array, sorted by their minimum difference score
     const keysIterable = Array.from(sortedMappedMinDifferences.keys())
 
+    // We create an array of the terms corresponding to the sorted indices, 
+    // filtering out the null values (which correspond to terms that are too short)
     const resultsPerIteration: string[] = 
       keysIterable.filter(key => key !== null).map(key => terms[key])
 
+    // if all the minimum differences are the same, and all the terms have the same length, we sort them alphabetically
     if (this.checkAlltheSameLength(resultsPerIteration) && this.checkAlltheSame(minDifferences)) {
       resultsPerIteration.sort((a, b) => a.localeCompare(b))
     }
 
-
+    // if only all the minimum differences are the same, we sort the terms by their length, shorter first
     if (this.checkAlltheSame(minDifferences)) {
       resultsPerIteration.sort((a, b) => a.length - b.length)
     }
   
+    // if there are multiple minimum differences that are the same, we sort the corresponding terms by their length, shorter first
     for (let i = 0; i < minDifferences.length; i++) {
       if (this.checkAlltheSame(minDifferences.slice(i, minDifferences.length))) {
         resultsPerIteration.splice(
@@ -89,17 +104,11 @@ export class TermSuggestionService {
       }
     }
 
+    // Finally, we return the first `count` terms from the sorted results, 
+    // which are the closest terms to the input term according to the specified rules
     return resultsPerIteration.slice(0, count)
 
   }
-
-  // private swapArrayElements = (arr: string[], a: number, b: number): string[] => 
-  //   { let _arr = [...arr]; 
-  //     let temp = _arr[a]; 
-  //     _arr[a] = _arr[b]; 
-  //     _arr[b] = temp; 
-  //     return _arr 
-  //   }
 
   private checkAlltheSame = (arr: ( number | null)[]): boolean => {
     const firstValue = arr[0]
@@ -110,73 +119,11 @@ export class TermSuggestionService {
     const firstValue = arr[0]
     return arr.every(value => value.length === firstValue.length)
   }
-
-  // private interchange(elements: string[], minDifferences: (number | null)[]): string[] {
-  //   let toReturnElements: string[] = [...elements]
-  //   for (let i = 0; i < toReturnElements.length; i++) {
-  //     if (minDifferences[i] === minDifferences[i + 1] &&
-  //       toReturnElements[i].length > toReturnElements[i + 1].length) {
-  //       toReturnElements = [...this.swapArrayElements(toReturnElements, i, i + 1)];
-  //     }
-  //   }
-  //   return toReturnElements;
-  // }
-
-  private getAllMatchs(count: number, minDifferences: (number | null)[], elements: string[], terms: string[]) {
-    const results: string[] = []
-    for (let i = 0; i <= count; i++) {
-      for (let j = 0; j < minDifferences.length; j++) {
-        if (minDifferences[j] === i) {
-          results.push(terms[j]);
-        }
-      }
-    }
-
-    return results
-  }
 }
 
-
-
-function customSort(): ((a: [number | null, number | null], b: [number | null, number | null]) => number) | undefined {
-  return (a, b) => {
+const customSort = (a: [number | null, number | null], b: [number | null, number | null]) : number => {
     if (a[1] === b[1]) return 0;
     if (a[1] === null) return 1;
     if (b[1] === null) return -1;
     return a[1] < b[1] ? -1 : 1;
-  };
 }
-// const minDifferences: (number|null)[] = []
-//     terms.forEach((element) => minDifferences.push(this.getMinDifferenceScore(term, element)))
-
-//     // 1. Moins de différences d'abord
-//     const mappedMinDifferences = new Map(minDifferences.map((value, index) => [index, value]))
-//     const sortedMappedMinDifferences = new Map([...mappedMinDifferences.entries()].sort((a, b) => {
-//       if(a[1] === b[1]) return 0;
-//       if (a[1] === null) return 1;
-//       if (b[1] === null) return -1;
-      
-//       return a[1] < b[1] ? -1 : 1
-//     }))
-
-//     const keysIterable = Array.from(sortedMappedMinDifferences.keys())
-
-//     let resultsPerIteration: string[] = []
-
-//     // resultsPerIteration contains all the elements matching, there are possibly doubles
-//     resultsPerIteration = [...this.getAllMatchs(count, minDifferences, resultsPerIteration, terms)]
-
-//     // resort all the matchs according keysIterable, that is to say according to the order of the minDifferences array
-//     resultsPerIteration = keysIterable.map(key => resultsPerIteration[key])
-    
-//     if (this.checkAlltheSame(minDifferences)) {
-//       resultsPerIteration.sort((a, b) => a.length - b.length)
-      
-//       if(this.checkAlltheSameLength(resultsPerIteration)) {
-//         resultsPerIteration.sort()
-//       }
-//     }
-    
-//     resultsPerIteration = [...this.interchange(resultsPerIteration, minDifferences)]
-    
-//     return resultsPerIteration.slice(0, count)
