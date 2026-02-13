@@ -9,6 +9,8 @@ export class TermSuggestionService {
    * @throws Error si les chaînes n'ont pas la même longueur.
    */
   getDifferenceScore(source: string, target: string): number {
+    // We split the source string into an array of characters, so we can iterate over it with the index, 
+    // and compare each character with the corresponding character in the target string
     const iterableArray = source.split('')
     let result = 0
 
@@ -29,7 +31,6 @@ export class TermSuggestionService {
    * Retourne `null` si le candidat est trop court.
    */
   getMinDifferenceScore(term: string, candidate: string): number | null {
-    // We populate the temporary results array with the highest number possible, that is the length of the candidate
     let temp:  number[] = []
 
     if (term.length > candidate.length) {
@@ -40,10 +41,15 @@ export class TermSuggestionService {
       return this.getDifferenceScore(term, candidate)
     }
 
+    // We iterate over the candidate string, starting from the first character, and we compare it with the term string,
+    // by taking a substring of the candidate string that has the same length as the term string, 
+    // and we calculate the difference score for each substring, and we push it to the temp array
+    // For example, if the term is "abc" and the candidate is "xabcx", we will compare "abc" with "xab", then with "abc", then with "bcx", and we will push the scores to the temp array
     for(let i = 0; i <= candidate.length - term.length; i++) {
       temp.push(this.getDifferenceScore(term, candidate.substring(i, i + term.length)))
     }
 
+    // Finally, we return the minimum score from the temp array, which is the best score for the candidate string
     return Math.min(...temp)
   }
 
