@@ -254,7 +254,7 @@ describe('TermSuggestionService', () => {
       const result = service.suggest('aaaa', terms, 3);
       // aaaa→0, aaab→1, aaba→1, abaa→1, baaa→1, aabb→2, abab→2
       // Top 3 : aaaa(0), puis parmi score 1 (tous len 4) → alpha : aaab, aaba
-      expect(result).toEqual(['aaaa', 'aaba', 'aaab']);
+      expect(result).toEqual(['aaaa', 'aaab', 'aaba']);
     });
 
     // ----- Termes avec caractères alphanumériques -----
