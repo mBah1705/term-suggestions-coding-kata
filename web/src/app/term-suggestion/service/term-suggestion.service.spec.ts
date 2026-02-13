@@ -117,7 +117,7 @@ describe('TermSuggestionService', () => {
   // =========================================================================
   // suggest — algorithme principal
   // =========================================================================
-  describe.only('suggest', () => {
+  describe('suggest', () => {
     // ----- Exemple de l'énoncé -----
     it('should return the expected result from the problem statement', () => {
       const terms = ['gros', 'gras', 'graisse', 'agressif', 'go', 'ros', 'gro'];
@@ -145,7 +145,7 @@ describe('TermSuggestionService', () => {
       // Seuls "gros" et "gras" sont valides (longueur >= 4), on demande 10
       const terms = ['gros', 'gras', 'go', 'ro'];
       const result = service.suggest('gros', terms, 10);
-      expect(result.length).toBe(2);
+      // expect(result.length).toBe(2);
       expect(result).toEqual(['gros', 'gras']);
     });
 
@@ -254,7 +254,7 @@ describe('TermSuggestionService', () => {
       const result = service.suggest('aaaa', terms, 3);
       // aaaa→0, aaab→1, aaba→1, abaa→1, baaa→1, aabb→2, abab→2
       // Top 3 : aaaa(0), puis parmi score 1 (tous len 4) → alpha : aaab, aaba
-      expect(result).toEqual(['aaaa', 'aaba', 'aaab']);
+      expect(result).toEqual(['aaaa', 'aaab', 'aaba']);
     });
 
     // ----- Termes avec caractères alphanumériques -----
