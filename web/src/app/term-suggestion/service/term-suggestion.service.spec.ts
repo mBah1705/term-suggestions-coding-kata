@@ -145,7 +145,7 @@ describe('TermSuggestionService', () => {
       // Seuls "gros" et "gras" sont valides (longueur >= 4), on demande 10
       const terms = ['gros', 'gras', 'go', 'ro'];
       const result = service.suggest('gros', terms, 10);
-      // expect(result.length).toBe(2);
+      expect(result.length).toBe(2);
       expect(result).toEqual(['gros', 'gras']);
     });
 
